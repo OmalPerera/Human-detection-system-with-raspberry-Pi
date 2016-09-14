@@ -14,5 +14,13 @@ You may need following components to get the expected Results
 * Update the OS to latest `sudo apt-get update`
 * Upgrade the OS `sudo apt-get upgrade`
 * Update the Raspberry Pi firmware `sudo rpi-update`
-* Should install OpenCV
-* Should Install Python
+* Should install OpenCV `sudo apt-get install libopencv`
+  If you need to update openCV to latest version install following dependencies
+    sudo apt-get install build-essential checkinstall cmake pkg-config yasm
+    sudo apt-get install libtiff4-dev libjpeg-dev libjasper-dev
+    sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev libxine-dev libgstreamer0.10-dev 
+libgstreamer-plugins-base0.10-dev libv4l-dev
+    sudo apt-get install python-dev python-numpy
+    sudo apt-get install libtbb-dev
+    sudo apt-get install libqt4-dev libgtk2.0-dev
+* Should Install Python `
