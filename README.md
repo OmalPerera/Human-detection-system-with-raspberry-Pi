@@ -16,6 +16,8 @@ You may need following components to get the expected Results
 * Update the Raspberry Pi firmware `sudo rpi-update`
 * Should install OpenCV `sudo apt-get install libopencv`
 * Should Install Python
+* pip install imutils
+* pip install dropbox
 
 If you need to update openCV to latest version install following dependencies
   ```
@@ -25,4 +27,9 @@ If you need to update openCV to latest version install following dependencies
   sudo apt-get install python-dev python-numpy
   sudo apt-get install libtbb-dev
   sudo apt-get install libqt4-dev libgtk2.0-dev
+  ```
+
+## Usage
+  ```
+python pi_surveillance.py --conf conf.json
   ```
