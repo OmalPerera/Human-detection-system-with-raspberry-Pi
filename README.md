@@ -1,5 +1,8 @@
 # Human Detection System using Raspberry Pi
 
+## Functionality
+Activates a relay on detecting motion.
+
 You may need following components to get the expected Results
 </br>
 ## Hardware Components
@@ -16,11 +19,9 @@ You may need following components to get the expected Results
 * Update the Raspberry Pi firmware `sudo rpi-update`
 * Should install OpenCV `sudo apt-get install libopencv`
 * Should Install Python
-```
-* pip install imutils
-* pip install dropbox
-* pip install RPi.GPIO
-  ```
+* ```pip install imutils```
+*  ```pip install RPi.GPIO```
+
 
 If you need to update openCV to latest version install following dependencies
   ```
