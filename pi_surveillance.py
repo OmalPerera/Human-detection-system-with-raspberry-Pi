@@ -8,11 +8,11 @@ from picamera import PiCamera
 import argparse
 import warnings
 import datetime
-import dropbox
 import imutils
 import json
 import time
 import cv2
+import RPi.GPIO as GPIO
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -20,23 +20,21 @@ ap.add_argument("-c", "--conf", required=True,
 	help="path to the JSON configuration file")
 args = vars(ap.parse_args())
 
-# filter warnings, load the configuration and initialize the Dropbox
-# client
+# filter warnings, load the configuration
 warnings.filterwarnings("ignore")
 conf = json.load(open(args["conf"]))
 client = None
-
-# check to see if the Dropbox should be used
-if conf["use_dropbox"]:
-	# connect to dropbox and start the session authorization process
-	client = dropbox.Dropbox(conf["dropbox_access_token"])
-	print("[SUCCESS] dropbox account linked")
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = tuple(conf["resolution"])
 camera.framerate = conf["fps"]
 rawCapture = PiRGBArray(camera, size=tuple(conf["resolution"]))
+
+#Setup Pins
+pin = 18
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(pin, GPIO.OUT, initial=0)
 
 # allow the camera to warmup, then initialize the average frame, last
 # uploaded timestamp, and frame motion counter
@@ -102,6 +100,10 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 
 	# check to see if the room is occupied
 	if text == "Occupied":
+		
+		#Activate pin
+		GPIO.output(pin, GPIO.HIGH)
+		
 		# check to see if enough time has passed between uploads
 		if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:
 			# increment the motion counter
@@ -110,18 +112,6 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 			# check to see if the number of frames with consistent motion is
 			# high enough
 			if motionCounter >= conf["min_motion_frames"]:
-				# check to see if dropbox sohuld be used
-				if conf["use_dropbox"]:
-					# write the image to temporary file
-					t = TempImage()
-					cv2.imwrite(t.path, frame)
-
-					# upload the image to Dropbox and cleanup the tempory image
-					print("[UPLOAD] {}".format(ts))
-					path = "/{base_path}/{timestamp}.jpg".format(
-					    base_path=conf["dropbox_base_path"], timestamp=ts)
-					client.files_upload(open(t.path, "rb").read(), path)
-					t.cleanup()
 
 				# update the last uploaded timestamp and reset the motion
 				# counter
@@ -131,6 +121,10 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 	# otherwise, the room is not occupied
 	else:
 		motionCounter = 0
+		
+		#Deactivate Pin
+		GPIO.output(pin, GPIO.LOW)
+		
 
 	# check to see if the frames should be displayed to screen
 	if conf["show_video"]:
@@ -144,3 +138,5 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 
 	# clear the stream in preparation for the next frame
 	rawCapture.truncate(0)
+
+GPIO.cleanup()
