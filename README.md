@@ -18,6 +18,7 @@ You may need following components to get the expected Results
 * Should Install Python
 * pip install imutils
 * pip install dropbox
+* pip install RPi.GPIO
 
 If you need to update openCV to latest version install following dependencies
   ```
