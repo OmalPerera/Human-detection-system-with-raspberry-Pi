@@ -13,14 +13,14 @@ You may need following components to get the expected Results
 
 
 ## Software Requirements
-* Any compatible Raspbian OS can be used. ([Raspbian Jessie](https://www.raspberrypi.org/blog/raspbian-jessie-is-here/) used for this project)
+* Any compatible Raspbian OS can be used.
 * Update the OS to latest `sudo apt-get update`
 * Upgrade the OS `sudo apt-get upgrade`
 * Update the Raspberry Pi firmware `sudo rpi-update`
 * Should install OpenCV `sudo apt-get install libopencv`
 * Should Install Python
-* ```pip install imutils```
-*  ```pip install RPi.GPIO```
+* imutils ```pip install imutils```
+* RPi.GPIO```pip install RPi.GPIO```
 
 
 If you need to update openCV to latest version install following dependencies
@@ -36,4 +36,4 @@ If you need to update openCV to latest version install following dependencies
 ## Usage
   ```
 python pi_surveillance.py --conf conf.json
-  ```
+```
