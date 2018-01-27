@@ -13,6 +13,10 @@ import json
 import time
 import cv2
 import RPi.GPIO as GPIO
+from __future__ import print_function
+from imutils.object_detection import non_max_suppression
+from imutils import paths
+import numpy as np
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -30,6 +34,10 @@ camera = PiCamera()
 camera.resolution = tuple(conf["resolution"])
 camera.framerate = conf["fps"]
 rawCapture = PiRGBArray(camera, size=tuple(conf["resolution"]))
+
+# initialize the HOG descriptor/person detector
+hog = cv2.HOGDescriptor()
+hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 #Setup Pins
 pin = 18
@@ -52,8 +60,15 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 	timestamp = datetime.datetime.now()
 	text = "Unoccupied"
 
-	# resize the frame, convert it to grayscale, and blur it
+	# resize the frame
 	frame = imutils.resize(frame, width=500)
+    orig = frame.copy()
+
+    # detect people in the image
+	(rects, weights) = hog.detectMultiScale(frame, winStride=(4, 4),
+		padding=(8, 8), scale=1.05)
+
+    # convert image to grayscale and blur it
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
@@ -85,11 +100,21 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 		if cv2.contourArea(c) < conf["min_area"]:
 			continue
 
-		# compute the bounding box for the contour, draw it on the frame,
-		# and update the text
-		(x, y, w, h) = cv2.boundingRect(c)
-		cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-		text = "Occupied"
+		# draw the original bounding boxes
+	    for (x, y, w, h) in rects:
+		    cv2.rectangle(orig, (x, y), (x + w, y + h), (0, 0, 255), 2)
+ 
+	    # apply non-maxima suppression to the bounding boxes using a
+	    # fairly large overlap threshold to try to maintain overlapping
+	    # boxes that are still people
+	    rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
+	    pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
+ 
+	    # draw the final bounding boxes
+	    for (xA, yA, xB, yB) in pick:
+	    	cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
+
+	    text = "Occupied"
 
 	# draw the text and timestamp on the frame
 	ts = timestamp.strftime("%A %d %B %Y %I:%M:%S%p")
@@ -140,3 +165,4 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 	rawCapture.truncate(0)
 
 GPIO.cleanup()
+
