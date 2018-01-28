@@ -1,10 +1,10 @@
 {
 	"show_video": true,
+	"min_upload_seconds": 3.0,
 	"min_motion_frames": 8,
 	"camera_warmup_time": 2.5,
-	"delta_thresh": 5,			//The minimum absolute value difference between our current frame and averaged frame for a given pixel to be “triggered” as motion. Smaller values will lead to more motion being detected, larger values to less motion detected.
+	"delta_thresh": 5,
 	"resolution": [640, 480],
 	"fps": 16,
-	"min_area": 5000			//The minimum area size of an image (in pixels) for a region to be considered motion or not. Smaller values will lead to more areas marked as motion, whereas higher values of min_area  will only mark larger regions as motion.
-								//can avoid little animals from this
+	"min_area": 5000
 }
